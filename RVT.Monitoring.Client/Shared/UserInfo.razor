@@ -1,0 +1,52 @@
+﻿@page "/UserInfo/{UserId:guid}"
+@using RVT.Monitoring.Shared.Models
+
+
+<h1>User Id " @UserId</h1>
+
+
+
+<AuthorizeView Roles="Administrator">
+    <Authorized>
+        Have Permisions
+        @AuthenticationStateProvider.GetAuthenticationStateAsync().Result.User.IsInRole("Administrator");
+
+
+
+
+
+    </Authorized>
+
+    <NotAuthorized>
+        Dont have permisions
+        @context.User.Identity.Name
+
+        @AuthenticationStateProvider.GetAuthenticationStateAsync().Result.User.IsInRole("User");
+
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+
+
+@code {
+    [Parameter]
+    public Guid UserId { get; set; }
+
+
+    protected override Task OnInitializedAsync()
+    {
+
+
+        return base.OnInitializedAsync();
+    }
+
+
+
+    //private async Task<RVTUserInfoModel> GetUserInfo()
+    //{
+
+    //    return null;
+    //}
+}

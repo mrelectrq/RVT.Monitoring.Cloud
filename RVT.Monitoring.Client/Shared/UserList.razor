@@ -1,0 +1,92 @@
+﻿@page "/getuserlist"
+
+@inject NavigationManager UriHelper
+@using RVT.Monitoring.Shared.Models
+<h3>ClientsList</h3>
+
+
+<AuthorizeView Roles="Administrator">
+    <Authorized>
+        Have Permisions
+        @AuthenticationStateProvider.GetAuthenticationStateAsync().Result.User.IsInRole("Administrator");
+
+
+
+        @if (rVTUsers is null)
+        {
+            <div> Loading ...</div>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>UsernName</td>
+                        <td>Email</td>
+                        <td>Name</td>
+                        <td>Surname</td>
+                        <td>Register Date</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var item in rVTUsers)
+                    {
+                        <tr>
+                            <td>@item.UserName</td>
+                            <td>@item.Email</td>
+                            <td>@item.Name</td>
+                            <td>@item.Surname</td>
+                            <td>@item.RegisterTimeStamp.ToShortDateString()</td>
+                            <td @onclick="(()=> GetUserInfo(item.UserID))" class="btn btn-dark">MoreInfo</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+    </Authorized>
+
+    <NotAuthorized>
+        Dont have permisions
+        @context.User.Identity.Name
+
+        @AuthenticationStateProvider.GetAuthenticationStateAsync().Result.User.IsInRole("User");
+
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+
+    private  List<RVTUserModel> rVTUsers;
+    private int pageNumber = 1;
+    private int itemsPerPage = 5;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUserList(pageNumber, itemsPerPage);
+    }
+
+
+
+    private async Task GetUserList(int index, int pageSize)
+    {
+        try
+        {
+
+            rVTUsers = await Http.GetFromJsonAsync<List<RVTUserModel>>($"https://localhost:44386/api/Administrator/getuserlist/{index}/{pageSize}");
+
+        }
+        catch
+        {
+
+        }
+    }
+    private void GetUserInfo(Guid UserId)
+    {
+
+        UriHelper.NavigateTo("UserInfo" +"/"+ UserId);
+        
+    }
+
+}
